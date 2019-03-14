@@ -1,0 +1,6 @@
+[package]
+name = "ParallelAlgorithms"
+version = "0.1.0"
+authors = ["iorweth <aenseidheiorweth@gmail.com>"]
+
+[dependencies]
