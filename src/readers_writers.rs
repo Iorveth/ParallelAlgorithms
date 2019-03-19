@@ -88,8 +88,8 @@ impl ReadersWriters {
 }
 pub fn readers_writers_test(readers_count: usize, writers_count: usize, priority: Priority){
     let mut readers_writers= ReadersWriters::new(readers_count, writers_count, priority);
-    let mut readers: Vec<_> = Vec::new();
-    let mut writers: Vec<_> = Vec::new();
+    let mut readers = Vec::new();
+    let mut writers = Vec::new();
     let readers_count = readers_writers.get_readers_count().load(Ordering::SeqCst);
     let writers_count = readers_writers.get_writers_count().load(Ordering::SeqCst);
 
