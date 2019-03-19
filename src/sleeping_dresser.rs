@@ -63,9 +63,8 @@ pub fn sleeping_dresser_test(capacity: usize, clients_amount: usize){
         }))
     }
 
-    let sleeping_dresser_cloned = sleeping_dresser.clone();
     spawn(move||{
-        sleeping_dresser_cloned.serve(receiver);
+        sleeping_dresser.serve(receiver);
     }).join().unwrap();
 
     for c in clients {
