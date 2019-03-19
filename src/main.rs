@@ -1,5 +1,3 @@
-extern crate core;
-
 mod eating_philosophers;
 mod readers_writers;
 mod sleeping_dresser;
@@ -12,6 +10,6 @@ fn main() {
     //readers_writers_test(5, 5, Priority::Equal);
     //Eating Philosophers
     //eating_philosophers_test();
+    //Sleeping Dresser
     sleeping_dresser_test(4, 20);
-
 }
