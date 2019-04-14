@@ -1,21 +1,21 @@
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 use std::thread;
 use std::thread::spawn;
-use std::sync::Arc;
 use std::time::Duration;
 
-pub struct Philosopher{
+pub struct Philosopher {
     name: String,
     left_hand: u8,
-    right_hand: u8
+    right_hand: u8,
 }
 
-impl Philosopher{
-    fn new(name: String, left_hand: u8, right_hand: u8) -> Philosopher{
-        Philosopher{
+impl Philosopher {
+    fn new(name: String, left_hand: u8, right_hand: u8) -> Philosopher {
+        Philosopher {
             name,
             left_hand,
-            right_hand
+            right_hand,
         }
     }
 
@@ -35,33 +35,41 @@ impl Philosopher{
     }
 }
 
-    fn init() -> (Arc<[AtomicBool; 5]>, Vec<Philosopher>) {
-        let mut forks: [AtomicBool; 5] = [
-            AtomicBool::new(false),
-            AtomicBool::new(false),
-            AtomicBool::new(false),
-            AtomicBool::new(false),
-            AtomicBool::new(false)];
-        let mut philosophers = Vec::new();
+fn init() -> (Arc<[AtomicBool; 5]>, Vec<Philosopher>) {
+    let mut forks: [AtomicBool; 5] = [
+        AtomicBool::new(false),
+        AtomicBool::new(false),
+        AtomicBool::new(false),
+        AtomicBool::new(false),
+        AtomicBool::new(false),
+    ];
+    let mut philosophers = Vec::new();
 
-        for i in 0..5 {
-            philosophers.push(Philosopher::new((i+1).to_string(), i, if i == 4 {0} else {i+1}));
-        }
-
-        (Arc::new(forks), philosophers)
+    for i in 0..5 {
+        philosophers.push(Philosopher::new(
+            (i + 1).to_string(),
+            i,
+            if i == 4 { 0 } else { i + 1 },
+        ));
     }
 
-    pub fn eating_philosophers_test(){
-        let (forks, philosophers) = init();
-        let mut handles: Vec<_> = philosophers.into_iter().map(|p| {
+    (Arc::new(forks), philosophers)
+}
+
+pub fn eating_philosophers_run() {
+    let (forks, philosophers) = init();
+    let mut handles: Vec<_> = philosophers
+        .into_iter()
+        .map(|p| {
             let forks_for_child = forks.clone();
 
             spawn(move || {
                 p.eat(&forks_for_child);
             })
-        }).collect();
+        })
+        .collect();
 
-        for h in handles {
-            h.join().unwrap();
-        }
+    for h in handles {
+        h.join().unwrap();
+    }
 }

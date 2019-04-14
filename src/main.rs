@@ -1,15 +1,15 @@
 mod eating_philosophers;
 mod readers_writers;
 mod sleeping_dresser;
-use readers_writers::readers_writers_test;
+use eating_philosophers::eating_philosophers_run;
+use readers_writers::readers_writers_run;
 use readers_writers::Priority;
-use eating_philosophers::eating_philosophers_test;
-use sleeping_dresser::sleeping_dresser_test;
+use sleeping_dresser::sleeping_dresser_run;
 fn main() {
     //ReadersWriters
-    //readers_writers_test(5, 5, Priority::Equal);
+    //readers_writers_run(5, 5, Priority::Equal);
     //Eating Philosophers
-    //eating_philosophers_test();
+    //eating_philosophers_run();
     //Sleeping Dresser
-    sleeping_dresser_test(4, 20);
+    sleeping_dresser_run(4, 20);
 }

@@ -1,13 +1,13 @@
-use std::sync::atomic::{AtomicUsize, AtomicBool, Ordering};
-use std::thread::spawn;
-use std::thread;
-use std::time::Duration;
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::{Arc, RwLock};
+use std::thread;
+use std::thread::spawn;
+use std::time::Duration;
 
 pub enum Priority {
     Readers,
     Writers,
-    Equal
+    Equal,
 }
 
 pub struct ReadersWriters {
@@ -15,7 +15,7 @@ pub struct ReadersWriters {
     writers_count: AtomicUsize,
     priority: Priority,
     read_lock: RwLock<AtomicBool>,
-    write_lock: RwLock<AtomicBool>
+    write_lock: RwLock<AtomicBool>,
 }
 
 impl ReadersWriters {
@@ -25,7 +25,7 @@ impl ReadersWriters {
             writers_count: AtomicUsize::new(writers_count),
             priority,
             read_lock: RwLock::new(AtomicBool::new(false)),
-            write_lock: RwLock::new(AtomicBool::new(false))
+            write_lock: RwLock::new(AtomicBool::new(false)),
         })
     }
 
@@ -48,25 +48,34 @@ impl ReadersWriters {
             Priority::Readers => {
                 self.get_readers_count().fetch_sub(1, Ordering::SeqCst);
                 if self.get_readers_count().load(Ordering::SeqCst) <= 0 {
-                    self.read_lock.read().unwrap().store(false, Ordering::SeqCst);
+                    self.read_lock
+                        .read()
+                        .unwrap()
+                        .store(false, Ordering::SeqCst);
                 }
             }
             Priority::Writers | Priority::Equal => {
-                self.read_lock.read().unwrap().store(false, Ordering::SeqCst);
+                self.read_lock
+                    .read()
+                    .unwrap()
+                    .store(false, Ordering::SeqCst);
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
     fn write(&self, i: usize) {
         match self.priority {
             Priority::Readers | Priority::Equal => {
-                while self.write_lock.write().unwrap().load(Ordering::SeqCst) == true || self.read_lock.read().unwrap().load(Ordering::SeqCst) == true  {}
+                while self.write_lock.write().unwrap().load(Ordering::SeqCst) == true
+                    || self.read_lock.read().unwrap().load(Ordering::SeqCst) == true
+                {
+                }
             }
             Priority::Writers => {
-                while self.read_lock.read().unwrap().load(Ordering::SeqCst) == true  {}
+                while self.read_lock.read().unwrap().load(Ordering::SeqCst) == true {}
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
         let mut write = self.write_lock.write().unwrap();
         write.store(true, Ordering::SeqCst);
@@ -82,12 +91,12 @@ impl ReadersWriters {
                     write.store(false, Ordering::SeqCst);
                 }
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 }
-pub fn readers_writers_test(readers_count: usize, writers_count: usize, priority: Priority){
-    let mut readers_writers= ReadersWriters::new(readers_count, writers_count, priority);
+pub fn readers_writers_run(readers_count: usize, writers_count: usize, priority: Priority) {
+    let mut readers_writers = ReadersWriters::new(readers_count, writers_count, priority);
     let mut readers = Vec::new();
     let mut writers = Vec::new();
     let readers_count = readers_writers.get_readers_count().load(Ordering::SeqCst);
